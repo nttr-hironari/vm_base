@@ -1,0 +1,9 @@
+---
+- hosts: all
+  user: vagrant
+  become: yes
+  roles:
+    - init
+    - git
+    - vim
+
