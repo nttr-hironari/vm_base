@@ -1,0 +1,9 @@
+---
+- name: install apache
+  become: yes
+  yum: name=httpd state=latest
+
+- name: install mod_wsgi
+  become: yes
+  yum: name=python36u-mod_wsgi state=latest
+

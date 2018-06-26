@@ -1,0 +1,87 @@
+---
+- name: install java-openjdk
+  become: yes
+  yum: name=java-1.8.0-openjdk state=latest
+
+- name: install java-openjdk-devel
+  become: yes
+  yum: name=java-1.8.0-openjdk-devel state=latest
+
+- name: install elasticsearch GPG key
+  rpm_key:
+    state: present
+    key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+# add elasticsearch repo
+- copy: >
+    src=./repos/elasticsearch.repo    
+    dest=/etc/yum.repos.d/elasticsearch.repo
+    owner=root
+    group=root
+    mode=0755
+
+- name: install elasticsearch
+  become: yes
+  yum: name=elasticsearch state=latest
+
+- name: "elasticsearch config modefied."
+  lineinfile: >-
+    dest='/etc/elasticsearch/elasticsearch.yml'
+    state=present
+    backrefs=yes
+    regexp='{{ item.regexp }}'
+    line='{{ item.line }}'
+  with_items:
+  - regexp: '^#?\s*#network\.host: 192\.168\.0\.1'
+    line: 'network.host: 192.168.33.15'
+  - regexp: '^#http\.port: 9200'
+    line: 'http.port: 9200'
+
+- name: start service elasticsearch
+  systemd:
+    name: elasticsearch
+    state: started
+    enabled: yes
+
+# add kibana repo
+- copy: >
+    src=./repos/kibana.repo    
+    dest=/etc/yum.repos.d/kibana.repo
+    owner=root
+    group=root
+    mode=0755
+
+- name: install kibana
+  become: yes
+  yum: name=kibana state=latest
+
+- name: "kibana config modefied."
+  lineinfile: >-
+    dest='/etc/kibana/kibana.yml'
+    state=present
+    backrefs=yes
+    regexp='{{ item.regexp }}'
+    line='{{ item.line }}'
+  with_items:
+  - regexp: '^#server\.port: 5601'
+    line: 'server.port: 5601'
+  - regexp: '^#server\.host: "localhost"'
+    line: 'server.host: "192.168.33.15"'
+  - regexp: '^#elasticsearch\.url: "http://localhost:9200"'
+    line: 'elasticsearch.url: "http://192.168.33.15:9200"'
+
+- name: start service kibana
+  systemd:
+    name: kibana    
+    state: started
+    enabled: yes
+
+# add firewall rules
+- firewalld: port=5601/tcp permanent=true state=enabled
+- firewalld: port=9200/tcp permanent=true state=enabled
+
+- name: start service firewalld
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes

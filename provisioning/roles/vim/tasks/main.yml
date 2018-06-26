@@ -1,0 +1,15 @@
+---
+- name: add repo vim ver8.0
+  become: yes
+  get_url:
+    url: https://copr.fedorainfracloud.org/coprs/mcepl/vim8/repo/epel-7/mcepl-vim8-epel-7.repo
+    dest: /etc/yum.repos.d/mcepl-vim8-epel-7.repo
+
+- name: update repos for vim
+  become: yes
+  yum: name=vim* state=latest
+
+- name: install vim ver8.0
+  become: yes
+  yum: name=vim state=latest
+
