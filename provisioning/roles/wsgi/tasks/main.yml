@@ -1,9 +1,11 @@
 ---
-- name: install apache
-  become: yes
-  yum: name=httpd state=latest
+- name: check installed httpd
+  shell: which httpd
+  register: exist_httpd
+  failed_when: exist_httpd not in [0, 1]
 
 - name: install mod_wsgi
   become: yes
   yum: name=python36u-mod_wsgi state=latest
+  when: exist_httpd.rc == 1
 

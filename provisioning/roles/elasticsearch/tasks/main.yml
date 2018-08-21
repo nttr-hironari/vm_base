@@ -33,7 +33,7 @@
     line='{{ item.line }}'
   with_items:
   - regexp: '^#?\s*#network\.host: 192\.168\.0\.1'
-    line: 'network.host: 192.168.33.15'
+    line: 'network.host: {{ ip }}'
   - regexp: '^#http\.port: 9200'
     line: 'http.port: 9200'
 
@@ -66,9 +66,9 @@
   - regexp: '^#server\.port: 5601'
     line: 'server.port: 5601'
   - regexp: '^#server\.host: "localhost"'
-    line: 'server.host: "192.168.33.15"'
+    line: 'server.host: "{{ ip }}"'
   - regexp: '^#elasticsearch\.url: "http://localhost:9200"'
-    line: 'elasticsearch.url: "http://192.168.33.15:9200"'
+    line: 'elasticsearch.url: "http://{{ ip }}:9200"'
 
 - name: start service kibana
   systemd:
